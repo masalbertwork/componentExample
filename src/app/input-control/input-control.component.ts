@@ -7,7 +7,16 @@ import {
   Renderer2,
   ViewChild
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALUE_ACCESSOR,
+  NgControl,
+  NG_VALIDATORS,
+  Validator,
+  FormControl,
+  AbstractControl,
+  ValidationErrors
+} from '@angular/forms';
 
 @Component({
   selector: 'app-input-control',
@@ -16,6 +25,11 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => InputControlComponent),
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
       useExisting: forwardRef(() => InputControlComponent),
       multi: true
     }
@@ -28,13 +42,23 @@ export class InputControlComponent implements OnInit, ControlValueAccessor {
   @ViewChild('textInput', { static: false }) textInput: ElementRef;
 
   value: string;
-  isDisabled: boolean;
+  // isDisabled: boolean;
   onChange = (_: any) => {};
   onTouch = () => {};
 
   constructor(private el: ElementRef, private renderer: Renderer2) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    // const validator = this.form.get('control').validator({} as AbstractControl);
+    // console.log(validator);
+    // if (validator && validator.required) {
+    //   return true;
+    // }
+  }
+
+  validate(control: AbstractControl): ValidationErrors | null {
+    return { custom: true };
+  }
 
   onInput(value: string) {
     this.counter = value.length;

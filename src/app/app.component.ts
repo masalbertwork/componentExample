@@ -13,7 +13,10 @@ export class AppComponent {
 
   constructor() {
     this.pruebaForm = new FormGroup({
-      pruebaInput: new FormControl('Chao', [Validators.minLength(3)])
+      pruebaInput: new FormControl('Chao', [
+        Validators.required,
+        Validators.minLength(3)
+      ])
     });
     this.disabledVar = false;
   }
