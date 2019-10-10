@@ -1,0 +1,10 @@
+<label>{{ myLabel }}</label
+><input
+  #textInput
+  type="text"
+  (input)="onInput($event.target.value)"
+  (focus)="ontouched()"
+  [value]="value"
+  [disabled]="isDisabled"
+/>
+<span>Number of letters: {{ counter }}</span>
