@@ -27,11 +27,6 @@ import {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => InputControlComponent),
       multi: true
-    },
-    {
-      provide: NG_VALIDATORS,
-      useExisting: forwardRef(() => InputControlComponent),
-      multi: true
     }
   ]
 })
@@ -56,9 +51,9 @@ export class InputControlComponent implements OnInit, ControlValueAccessor {
     // }
   }
 
-  validate(control: AbstractControl): ValidationErrors | null {
-    return { custom: true };
-  }
+  // validate(control: AbstractControl): ValidationErrors | null {
+  //   return { custom: false };
+  // }
 
   onInput(value: string) {
     this.counter = value.length;
