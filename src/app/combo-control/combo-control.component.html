@@ -11,5 +11,7 @@ Selected option: {{ selectedOption | json }}</pre
   typeaheadOptionField="name"
   (typeaheadOnSelect)="onSelect($event)"
   (typeaheadNoResults)="typeaheadNoResults($event)"
+  (blur)="blur()"
+  (focus)="tocat()"
   class="form-control"
 />

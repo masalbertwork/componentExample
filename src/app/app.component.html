@@ -13,7 +13,11 @@
     <div><button (click)="disa()">DISABLED</button></div>
     <br />
     <app-combo-control formControlName="pruebaCombo"></app-combo-control>
-    <div>VALID:{{ pruebaForm.get('pruebaCombo').valid }}</div>
+    <div>
+      VALID:{{ pruebaForm.get('pruebaCombo').valid }},TOUCHED:{{
+        pruebaForm.get('pruebaCombo').touched
+      }}
+    </div>
   </form>
   <div><button (click)="remove()">ERASE</button></div>
 </div>

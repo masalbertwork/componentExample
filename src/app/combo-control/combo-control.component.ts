@@ -112,4 +112,11 @@ export class ComboControlComponent implements OnInit, ControlValueAccessor {
   setDisabledState(isDisabled: boolean): void {
     this.isDisabled = isDisabled;
   }
+  tocat() {
+    console.log(`touched`);
+    this.onTouch();
+  }
+  blur() {
+    console.log(`onBlur`);
+  }
 }
