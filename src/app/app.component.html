@@ -1,17 +1,19 @@
 <!--The content below is only a placeholder and can be replaced.-->
-<app-input-control [myLabel]="'Label de mi input'"> </app-input-control>
-
-<form [formGroup]="pruebaForm">
-  <app-input-control
-    [myLabel]="'formcontrolname'"
-    formControlName="pruebaInput"
-    [disabled]="disabledVar"
-  >
-  </app-input-control>
-</form>
-<div><button (click)="remove()">ERASE</button></div>
-<div><button (click)="disa()">DISABLED</button></div>
-<div>VALID:{{ pruebaForm.get('pruebaInput').valid }}</div>
-<div>TOUCHED:{{ pruebaForm.get('pruebaInput').touched }}</div>
-<div>DIRTY:{{ pruebaForm.get('pruebaInput').dirty }}</div>
-<div>DISABLED:{{ pruebaForm.get('pruebaInput').disabled }}</div>
+<div class="ui-g h-100">
+  <form [formGroup]="pruebaForm">
+    <app-input-control [myLabel]="'label'" formControlName="pruebaInput">
+    </app-input-control>
+    <div>
+      VALID:{{ pruebaForm.get('pruebaInput').valid }},TOUCHED:{{
+        pruebaForm.get('pruebaInput').touched
+      }},DIRTY:{{ pruebaForm.get('pruebaInput').dirty }},DISABLED:{{
+        pruebaForm.get('pruebaInput').disabled
+      }}
+    </div>
+    <div><button (click)="disa()">DISABLED</button></div>
+    <br />
+    <app-combo-control formControlName="pruebaCombo"></app-combo-control>
+    <div>VALID:{{ pruebaForm.get('pruebaCombo').valid }}</div>
+  </form>
+  <div><button (click)="remove()">ERASE</button></div>
+</div>

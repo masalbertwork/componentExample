@@ -1,23 +1,31 @@
-import { Component } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import {
+  FormGroup,
+  FormControl,
+  Validators,
+  FormBuilder
+} from '@angular/forms';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
-  myText: string = '';
+export class AppComponent implements OnInit {
   pruebaForm: FormGroup;
   disabledVar: boolean;
 
-  constructor() {
-    this.pruebaForm = new FormGroup({
+  constructor(private fb: FormBuilder) {}
+
+  ngOnInit() {
+    this.pruebaForm = this.fb.group({
       pruebaInput: new FormControl('Chao', [
         Validators.required,
         Validators.minLength(3)
-      ])
+      ]),
+      pruebaCombo: new FormControl(null, [Validators.required])
     });
+
     this.disabledVar = false;
   }
 
