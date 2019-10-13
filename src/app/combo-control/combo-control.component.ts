@@ -1,4 +1,10 @@
-import { Component, OnInit, forwardRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  forwardRef,
+  Output,
+  EventEmitter
+} from '@angular/core';
 import { Observable, observable, of } from 'rxjs';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/typeahead-match.class';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -75,16 +81,20 @@ export class ComboControlComponent implements OnInit, ControlValueAccessor {
   ];
   noResult: boolean;
   isDisabled: boolean;
+  @Output() selectElement: EventEmitter<any>;
   onChange = (_: any) => {};
   onTouch = () => {};
 
-  constructor() {}
+  constructor() {
+    this.selectElement = new EventEmitter<any>();
+  }
 
   ngOnInit() {}
 
   onSelect(event: TypeaheadMatch): void {
     this.selectedOption = event.item;
     this.onChange(event.value);
+    this.selectElement.emit(event);
   }
 
   typeaheadNoResults(event: boolean): void {

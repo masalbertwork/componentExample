@@ -1,0 +1,7 @@
+<form [formGroup]="myForm">
+  EMPRESA:
+  <app-combo-control
+    formControlName="user"
+    (selectElement)="onSelect($event)"
+  ></app-combo-control>
+</form>

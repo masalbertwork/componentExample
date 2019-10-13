@@ -11,7 +11,17 @@
       }}
     </div>
     <div><button (click)="disa()">DISABLED</button></div>
-    <br />
+
+    <app-combo-empresa
+      formControlName="empresa"
+      (selectElement)="onSelect($event)"
+    ></app-combo-empresa>
+    <div>
+      VALID:{{ pruebaForm.get('empresa').valid }},TOUCHED:{{
+        pruebaForm.get('empresa').touched
+      }}
+    </div>
+
     <app-combo-control formControlName="pruebaCombo"></app-combo-control>
     <div>
       VALID:{{ pruebaForm.get('pruebaCombo').valid }},TOUCHED:{{

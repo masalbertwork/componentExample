@@ -23,12 +23,16 @@ export class AppComponent implements OnInit {
         Validators.required,
         Validators.minLength(3)
       ]),
+      empresa: new FormControl(null, [Validators.required]),
       pruebaCombo: new FormControl(null, [Validators.required])
     });
 
     this.disabledVar = false;
   }
 
+  onSelect(event): void {
+    console.log(event);
+  }
   remove() {
     this.pruebaForm.reset();
   }

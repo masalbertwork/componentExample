@@ -7,9 +7,10 @@ import { InputControlModule } from './input-control/input-control.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ComboControlComponent } from './combo-control/combo-control.component';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
+import { ComboEmpresaComponent } from './combo-empresa/combo-empresa.component';
 
 @NgModule({
-  declarations: [AppComponent, ComboControlComponent],
+  declarations: [AppComponent, ComboControlComponent, ComboEmpresaComponent],
   imports: [
     BrowserModule,
     InputControlModule,
