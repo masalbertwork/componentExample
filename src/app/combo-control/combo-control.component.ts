@@ -22,9 +22,6 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
   ]
 })
 export class ComboControlComponent implements OnInit, ControlValueAccessor {
-  empresasObservable: Observable<
-    { id: number; name: string; region: string }[]
-  >;
   selectedValue: string;
   selectedOption: any;
   states: any[] = [
@@ -82,11 +79,15 @@ export class ComboControlComponent implements OnInit, ControlValueAccessor {
   noResult: boolean;
   isDisabled: boolean;
   @Output() selectElement: EventEmitter<any>;
+  @Output() noSelectElement: EventEmitter<any>;
+  @Output() focusElement: EventEmitter<any>;
   onChange = (_: any) => {};
   onTouch = () => {};
 
   constructor() {
     this.selectElement = new EventEmitter<any>();
+    this.noSelectElement = new EventEmitter<any>();
+    this.focusElement = new EventEmitter<any>();
   }
 
   ngOnInit() {}
@@ -100,6 +101,7 @@ export class ComboControlComponent implements OnInit, ControlValueAccessor {
   typeaheadNoResults(event: boolean): void {
     this.noResult = event;
     this.onChange(null);
+    this.noSelectElement.emit(null);
     this.writeValue(null);
   }
 
@@ -125,6 +127,7 @@ export class ComboControlComponent implements OnInit, ControlValueAccessor {
   tocat() {
     console.log(`touched`);
     this.onTouch();
+    this.focusElement.emit(this.selectedValue);
   }
   blur() {
     console.log(`onBlur`);

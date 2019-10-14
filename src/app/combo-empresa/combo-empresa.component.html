@@ -3,5 +3,8 @@
   <app-combo-control
     formControlName="user"
     (selectElement)="onSelect($event)"
+    (noSelectElement)="noSelect($event)"
+    (focusElement)="tocat($event)"
+    (focus)="tocat()"
   ></app-combo-control>
 </form>

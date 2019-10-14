@@ -12,14 +12,22 @@
     </div>
     <div><button (click)="disa()">DISABLED</button></div>
 
+    <div
+      class="jumbotron"
+      [ngClass]="{ novalid: !pruebaForm.get('empresa').valid }"
+      *ngIf="showDades"
+    >
+      {{ pruebaForm.get('empresa').value }}
+    </div>
     <app-combo-empresa
       formControlName="empresa"
       (selectElement)="onSelect($event)"
+      (noSelectElement)="noSelect($event)"
     ></app-combo-empresa>
     <div>
       VALID:{{ pruebaForm.get('empresa').valid }},TOUCHED:{{
         pruebaForm.get('empresa').touched
-      }}
+      }},DIRTY:{{ pruebaForm.get('empresa').dirty }}
     </div>
 
     <app-combo-control formControlName="pruebaCombo"></app-combo-control>

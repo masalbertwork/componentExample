@@ -14,6 +14,7 @@ import {
 export class AppComponent implements OnInit {
   pruebaForm: FormGroup;
   disabledVar: boolean;
+  showDades: boolean;
 
   constructor(private fb: FormBuilder) {}
 
@@ -23,7 +24,10 @@ export class AppComponent implements OnInit {
         Validators.required,
         Validators.minLength(3)
       ]),
-      empresa: new FormControl(null, [Validators.required]),
+      empresa: new FormControl(null, [
+        Validators.required,
+        Validators.minLength(7)
+      ]),
       pruebaCombo: new FormControl(null, [Validators.required])
     });
 
@@ -31,8 +35,15 @@ export class AppComponent implements OnInit {
   }
 
   onSelect(event): void {
+    this.showDades = true;
     console.log(event);
   }
+
+  noSelect(event): void {
+    this.showDades = false;
+    console.log(event);
+  }
+
   remove() {
     this.pruebaForm.reset();
   }
