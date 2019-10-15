@@ -32,6 +32,7 @@ export class ComboEmpresaComponent implements OnInit, ControlValueAccessor {
   selectedOption: any;
   noResult: boolean;
   isDisabled: boolean;
+
   onChange = (_: any) => {};
   onTouch = () => {};
 
@@ -54,6 +55,12 @@ export class ComboEmpresaComponent implements OnInit, ControlValueAccessor {
     // this.onChange(null);
     // this.writeValue(null);
     // this.noSelectElement.emit({ event });
+  }
+
+  delete(event) {
+    // this.myForm.reset();
+    this.onChange(null);
+    this.writeValue(null);
   }
 
   tocat(event) {

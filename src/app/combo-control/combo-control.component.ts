@@ -5,7 +5,8 @@ import {
   Output,
   EventEmitter,
   ViewChild,
-  ElementRef
+  ElementRef,
+  DoCheck
 } from '@angular/core';
 import { Observable, observable, of } from 'rxjs';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/typeahead-match.class';
@@ -23,7 +24,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
     }
   ]
 })
-export class ComboControlComponent implements OnInit, ControlValueAccessor {
+export class ComboControlComponent
+  implements OnInit, ControlValueAccessor, DoCheck {
   selectedValue: string;
   selectedOption: any;
   states: any[] = [
@@ -80,9 +82,13 @@ export class ComboControlComponent implements OnInit, ControlValueAccessor {
   ];
   noResult: boolean;
   isDisabled: boolean;
+  emmitdelete: boolean;
+
   @Output() selectElement: EventEmitter<any>;
   @Output() noSelectElement: EventEmitter<any>;
   @Output() focusElement: EventEmitter<any>;
+  @Output() deleteElement: EventEmitter<any>;
+
   onChange = (_: any) => {};
   onTouch = () => {};
 
@@ -90,14 +96,18 @@ export class ComboControlComponent implements OnInit, ControlValueAccessor {
     this.selectElement = new EventEmitter<any>();
     this.noSelectElement = new EventEmitter<any>();
     this.focusElement = new EventEmitter<any>();
+    this.deleteElement = new EventEmitter<any>();
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.emmitdelete = false;
+  }
 
   onSelect(event: TypeaheadMatch): void {
     this.selectedOption = event.item;
     this.onChange(event.value);
     this.selectElement.emit(event);
+    this.emmitdelete = false;
   }
 
   typeaheadNoResults(event: boolean): void {
@@ -143,11 +153,27 @@ export class ComboControlComponent implements OnInit, ControlValueAccessor {
     this.onChange(this.selectedValue);
     // }
   }
-  canvi(evt: Event) {
-    console.log(`canvi:${evt}`);
+  canvi(event) {
+    // if (
+    //   event.currentTarget.value === '' ||
+    //   event.currentTarget.value === null
+    // ) {
+    //   this.selectedOption = null;
+    //   this.selectedValue = null;
+    // }
+    // console.log(`canvi:${event.currentTarget.value}`);
   }
 
   marxem(event) {
     this.onChange(this.selectedValue);
+  }
+
+  ngDoCheck() {
+    if (this.selectedValue === '') {
+      if (!this.emmitdelete) {
+        this.emmitdelete = true;
+        this.deleteElement.emit({ event: 'deleteElement', object: null });
+      }
+    }
   }
 }

@@ -3,6 +3,7 @@
   <app-combo-control
     formControlName="user"
     (selectElement)="onSelect($event)"
+    (deleteElement)="delete($event)"
     (noSelectElement)="noSelect($event)"
     (focusElement)="tocat($event)"
     (focus)="tocat()"
