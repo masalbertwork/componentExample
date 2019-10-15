@@ -1,9 +1,9 @@
-<pre class="card card-block card-header mb-1">
+<!-- <pre class="card card-block card-header mb-1">
 Model: {{ selectedValue | json }}</pre
 >
 <pre class="card card-block card-header mb-1">
 Selected option: {{ selectedOption | json }}</pre
->
+> -->
 
 <input
   [(ngModel)]="selectedValue"
@@ -15,3 +15,4 @@ Selected option: {{ selectedOption | json }}</pre
   (focus)="tocat()"
   class="form-control"
 />
+<!-- [typeaheadMinLength]="0"   per obir al tocar -->

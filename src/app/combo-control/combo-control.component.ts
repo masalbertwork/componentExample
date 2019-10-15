@@ -3,7 +3,9 @@ import {
   OnInit,
   forwardRef,
   Output,
-  EventEmitter
+  EventEmitter,
+  ViewChild,
+  ElementRef
 } from '@angular/core';
 import { Observable, observable, of } from 'rxjs';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/typeahead-match.class';
@@ -110,6 +112,7 @@ export class ComboControlComponent implements OnInit, ControlValueAccessor {
       this.selectedOption = value || '';
     } else {
       this.selectedOption = null;
+      this.selectedValue = null;
     }
   }
 
