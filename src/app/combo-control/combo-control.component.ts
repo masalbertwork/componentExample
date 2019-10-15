@@ -123,7 +123,6 @@ export class ComboControlComponent
     if (value) {
       this.selectedOption = value || '';
     } else {
-      console.log('ein');
       this.selectedOption = null;
       this.selectedValue = null;
     }

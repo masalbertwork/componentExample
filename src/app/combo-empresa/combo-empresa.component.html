@@ -1,6 +1,7 @@
 <div [formGroup]="myForm">
   EMPRESA:
   <app-combo-control
+    #combo
     formControlName="user"
     (selectElement)="onSelect($event)"
     (deleteElement)="delete($event)"
