@@ -101,16 +101,19 @@ export class ComboControlComponent implements OnInit, ControlValueAccessor {
   }
 
   typeaheadNoResults(event: boolean): void {
+    // if (event && this.selectedValue.length >= 3) {
     this.noResult = event;
-    this.onChange(null);
+    // this.onChange(null);
     this.noSelectElement.emit(null);
-    this.writeValue(null);
+    // this.writeValue(null);
+    // }
   }
 
   writeValue(value: any): void {
     if (value) {
       this.selectedOption = value || '';
     } else {
+      console.log('ein');
       this.selectedOption = null;
       this.selectedValue = null;
     }
@@ -127,12 +130,24 @@ export class ComboControlComponent implements OnInit, ControlValueAccessor {
   setDisabledState(isDisabled: boolean): void {
     this.isDisabled = isDisabled;
   }
-  tocat() {
+
+  tocat(evt: Event) {
     console.log(`touched`);
     this.onTouch();
     this.focusElement.emit(this.selectedValue);
   }
-  blur() {
+
+  blur(evt: Event) {
     console.log(`onBlur`);
+    // if( this.selectedOption === null || this.selectedOption === '' ){
+    this.onChange(this.selectedValue);
+    // }
+  }
+  canvi(evt: Event) {
+    console.log(`canvi:${evt}`);
+  }
+
+  marxem(event) {
+    this.onChange(this.selectedValue);
   }
 }

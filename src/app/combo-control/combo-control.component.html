@@ -11,8 +11,11 @@ Selected option: {{ selectedOption | json }}</pre
   typeaheadOptionField="name"
   (typeaheadOnSelect)="onSelect($event)"
   (typeaheadNoResults)="typeaheadNoResults($event)"
-  (blur)="blur()"
-  (focus)="tocat()"
+  [typeaheadMinLength]="0"
+  (change)="canvi($event)"
+  (blur)="blur($event)"
+  (focus)="tocat($event)"
+  (focusout)="marxem()"
   class="form-control"
 />
 <!-- [typeaheadMinLength]="0"   per obir al tocar -->

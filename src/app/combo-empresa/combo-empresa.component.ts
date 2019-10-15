@@ -51,9 +51,9 @@ export class ComboEmpresaComponent implements OnInit, ControlValueAccessor {
   }
 
   noSelect(event) {
-    this.onChange(null);
-    this.writeValue(null);
-    this.noSelectElement.emit({ event });
+    // this.onChange(null);
+    // this.writeValue(null);
+    // this.noSelectElement.emit({ event });
   }
 
   tocat(event) {
