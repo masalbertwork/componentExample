@@ -36,6 +36,20 @@
         pruebaForm.get('pruebaCombo').touched
       }}
     </div>
+    <div>COMBO1</div>
+    <app-combo1 formControlName="prueba"></app-combo1>
+    <div>
+      VALID:{{ pruebaForm.get('prueba').valid }},TOUCHED:{{
+        pruebaForm.get('prueba').touched
+      }}
+    </div>
+    <div>COMBO2</div>
+    <app-combo2 formControlName="prueba2"></app-combo2>
+    <div>
+      VALID:{{ pruebaForm.get('prueba2').valid }},TOUCHED:{{
+        pruebaForm.get('prueba2').touched
+      }}
+    </div>
   </form>
   <div><button (click)="remove()">RESET FORM</button></div>
 </div>

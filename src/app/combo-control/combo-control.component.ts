@@ -6,26 +6,44 @@ import {
   EventEmitter,
   ViewChild,
   ElementRef,
-  DoCheck
+  DoCheck,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Optional,
+  Self
 } from '@angular/core';
 import { Observable, observable, of } from 'rxjs';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/typeahead-match.class';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALUE_ACCESSOR,
+  NgControl,
+  Validator,
+  AbstractControl,
+  ValidationErrors,
+  NG_VALIDATORS
+} from '@angular/forms';
 
 @Component({
   selector: 'app-combo-control',
   templateUrl: './combo-control.component.html',
   styleUrls: ['./combo-control.component.scss'],
   providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => ComboControlComponent),
-      multi: true
-    }
-  ]
+    //   {
+    //     provide: NG_VALUE_ACCESSOR,
+    //     useExisting: forwardRef(() => ComboControlComponent),
+    //     multi: true
+    //   },
+    // {
+    //   provide: NG_VALIDATORS,
+    //   useExisting: forwardRef(() => ComboControlComponent),
+    //   multi: true
+    // }
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ComboControlComponent
-  implements OnInit, ControlValueAccessor, DoCheck {
+  implements OnInit, ControlValueAccessor, DoCheck, Validator {
   selectedValue: string;
   selectedOption: any;
   states: any[] = [
@@ -88,15 +106,25 @@ export class ComboControlComponent
   @Output() noSelectElement: EventEmitter<any>;
   @Output() focusElement: EventEmitter<any>;
   @Output() deleteElement: EventEmitter<any>;
-
+  @Output() validaElement: EventEmitter<any>;
   onChange = (_: any) => {};
   onTouch = () => {};
 
-  constructor() {
+  constructor(
+    private cd: ChangeDetectorRef,
+    @Optional() @Self() public ngControl: NgControl
+  ) {
     this.selectElement = new EventEmitter<any>();
     this.noSelectElement = new EventEmitter<any>();
     this.focusElement = new EventEmitter<any>();
     this.deleteElement = new EventEmitter<any>();
+    this.validaElement = new EventEmitter<any>();
+
+    if (this.ngControl != null) {
+      // Setting the value accessor directly (instead of using
+      // the providers) to avoid running into a circular import.
+      this.ngControl.valueAccessor = this;
+    }
   }
 
   ngOnInit() {
@@ -108,6 +136,8 @@ export class ComboControlComponent
     this.onChange(event.value);
     this.selectElement.emit(event);
     this.emmitdelete = false;
+    // this.cd.detectChanges();
+    this.cd.markForCheck();
   }
 
   typeaheadNoResults(event: boolean): void {
@@ -126,6 +156,7 @@ export class ComboControlComponent
       this.selectedOption = null;
       this.selectedValue = null;
     }
+    this.cd.markForCheck();
   }
 
   registerOnChange(fn: any): void {
@@ -140,19 +171,44 @@ export class ComboControlComponent
     this.isDisabled = isDisabled;
   }
 
+  validate(control: AbstractControl): ValidationErrors | null {
+    if (!control) {
+      // this.control = control;
+    }
+
+    // if (this.control && this.input) {
+    // this.input.control.setValidators(this.control.validator);
+    // }
+
+    if (control.value === 'qqq') {
+      return { error: 'Inner error:The value is 1' };
+    }
+
+    return null;
+  }
+
   tocat(evt: Event) {
     console.log(`touched`);
     this.onTouch();
     this.focusElement.emit(this.selectedValue);
   }
 
-  blur(evt: Event) {
+  blur(evt) {
     console.log(`onBlur`);
     // if( this.selectedOption === null || this.selectedOption === '' ){
-    this.onChange(this.selectedValue);
-    // }
+    if (evt.currentTarget.value === this.selectedOption.name) {
+      this.onChange(this.selectedValue);
+    } else {
+      this.selectedOption = null;
+      this.selectedValue = null;
+      this.onChange(null);
+      this.ngControl.control.setErrors({ invalid: true });
+      this.validaElement.emit();
+    }
+
+    // this.cd.markForCheck();
   }
-  canvi(event) {
+  canvi(evt) {
     // if (
     //   event.currentTarget.value === '' ||
     //   event.currentTarget.value === null
@@ -160,7 +216,19 @@ export class ComboControlComponent
     //   this.selectedOption = null;
     //   this.selectedValue = null;
     // }
-    // console.log(`canvi:${event.currentTarget.value}`);
+    console.log(`canvi:${evt.currentTarget.value}`);
+    if (evt.currentTarget.value === this.selectedOption.name) {
+      this.onChange(this.selectedValue);
+    } else {
+      this.selectedOption = null;
+      this.selectedValue = null;
+      this.onChange(null);
+      // this.ngControl.control.setErrors({ valid: false });
+      this.ngControl.control.setErrors({ invalid: true });
+      this.validaElement.emit();
+    }
+
+    // this.cd.markForCheck();
   }
 
   marxem(event) {

@@ -8,9 +8,17 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ComboControlComponent } from './combo-control/combo-control.component';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { ComboEmpresaComponent } from './combo-empresa/combo-empresa.component';
+import { Combo1Component } from './combo1/combo1.component';
+import { Combo2Component } from './combo1 copy/combo2.component';
 
 @NgModule({
-  declarations: [AppComponent, ComboControlComponent, ComboEmpresaComponent],
+  declarations: [
+    AppComponent,
+    ComboControlComponent,
+    ComboEmpresaComponent,
+    Combo1Component,
+    Combo2Component
+  ],
   imports: [
     BrowserModule,
     InputControlModule,

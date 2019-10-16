@@ -1,0 +1,8 @@
+<input
+  #input
+  autocomplete="none"
+  name="myinput"
+  [ngModel]="value"
+  (ngModelChange)="change($event)"
+  (blur)="onTouched()"
+/>

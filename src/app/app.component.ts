@@ -28,7 +28,18 @@ export class AppComponent implements OnInit {
         Validators.required,
         Validators.minLength(7)
       ]),
-      pruebaCombo: new FormControl(null, [Validators.required])
+      pruebaCombo: new FormControl(null, [
+        Validators.required,
+        Validators.minLength(7)
+      ]),
+      prueba: new FormControl(null, [
+        Validators.required,
+        Validators.minLength(7)
+      ]),
+      prueba2: new FormControl(null, [
+        Validators.required,
+        Validators.minLength(7)
+      ])
     });
 
     this.disabledVar = false;

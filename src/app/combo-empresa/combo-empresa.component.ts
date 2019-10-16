@@ -3,13 +3,22 @@ import {
   OnInit,
   Output,
   EventEmitter,
-  forwardRef
+  forwardRef,
+  ViewChild,
+  Optional,
+  Self,
+  AfterViewInit
 } from '@angular/core';
 import {
   ControlValueAccessor,
   FormGroup,
   FormControl,
-  NG_VALUE_ACCESSOR
+  NG_VALUE_ACCESSOR,
+  NgControl,
+  AbstractControl,
+  ValidationErrors,
+  NG_VALIDATORS,
+  Validator
 } from '@angular/forms';
 
 @Component({
@@ -21,10 +30,16 @@ import {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => ComboEmpresaComponent),
       multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => ComboEmpresaComponent),
+      multi: true
     }
   ]
 })
-export class ComboEmpresaComponent implements OnInit, ControlValueAccessor {
+export class ComboEmpresaComponent
+  implements OnInit, ControlValueAccessor, Validator, AfterViewInit {
   @Output() selectElement: EventEmitter<any>;
   @Output() noSelectElement: EventEmitter<any>;
   myForm: FormGroup;
@@ -32,9 +47,11 @@ export class ComboEmpresaComponent implements OnInit, ControlValueAccessor {
   selectedOption: any;
   noResult: boolean;
   isDisabled: boolean;
+  @ViewChild('combo', { static: false, read: NgControl }) combo;
 
   onChange = (_: any) => {};
   onTouch = () => {};
+  control;
 
   constructor() {
     this.myForm = new FormGroup({
@@ -45,6 +62,10 @@ export class ComboEmpresaComponent implements OnInit, ControlValueAccessor {
   }
 
   ngOnInit() {}
+
+  ngAfterViewInit() {
+    this.validate(null);
+  }
 
   onSelect(event) {
     this.onChange(event.value);
@@ -64,7 +85,7 @@ export class ComboEmpresaComponent implements OnInit, ControlValueAccessor {
   }
 
   tocat(event) {
-    console.log(event);
+    console.log('tocat' + event);
     this.onTouch();
   }
 
@@ -83,4 +104,22 @@ export class ComboEmpresaComponent implements OnInit, ControlValueAccessor {
   }
 
   setDisabledState(isDisabled: boolean): void {}
+
+  validate(control: AbstractControl): ValidationErrors | null {
+    if (!this.control) {
+      this.control = control;
+    }
+    // if (this.control && this.combo) {
+    //   this.combo.control.setValidators(this.control.validator);
+    // }
+
+    if (this.combo.control.errors) {
+      return { invalid: true };
+    }
+    return null;
+  }
+
+  refrescValidacio() {
+    this.validate(this.combo);
+  }
 }
