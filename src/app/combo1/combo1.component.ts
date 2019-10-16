@@ -71,7 +71,7 @@ export class Combo1Component
     if (this.control && this.input) {
       this.input.control.setValidators(this.control.validator);
     }
-    if (control.value === 'qqq') {
+    if (control && control.value === 'qqq') {
       return { error: 'Inner error:The value is 1' };
     }
     return null;

@@ -7,7 +7,9 @@ import {
   ViewChild,
   Optional,
   Self,
-  AfterViewInit
+  AfterViewInit,
+  ChangeDetectorRef,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import {
   ControlValueAccessor,
@@ -24,22 +26,23 @@ import {
 @Component({
   selector: 'app-combo-empresa',
   templateUrl: './combo-empresa.component.html',
-  styleUrls: ['./combo-empresa.component.scss'],
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => ComboEmpresaComponent),
-      multi: true
-    },
-    {
-      provide: NG_VALIDATORS,
-      useExisting: forwardRef(() => ComboEmpresaComponent),
-      multi: true
-    }
-  ]
+  styleUrls: ['./combo-empresa.component.scss']
+  // changeDetection: ChangeDetectionStrategy.OnPush
+  // providers: [
+  //   {
+  //     provide: NG_VALUE_ACCESSOR,
+  //     useExisting: forwardRef(() => ComboEmpresaComponent),
+  //     multi: true
+  //   },
+  //   {
+  //     provide: NG_VALIDATORS,
+  //     useExisting: forwardRef(() => ComboEmpresaComponent),
+  //     multi: true
+  //   }
+  // ]
 })
 export class ComboEmpresaComponent
-  implements OnInit, ControlValueAccessor, Validator, AfterViewInit {
+  implements OnInit, ControlValueAccessor, AfterViewInit {
   @Output() selectElement: EventEmitter<any>;
   @Output() noSelectElement: EventEmitter<any>;
   myForm: FormGroup;
@@ -47,29 +50,40 @@ export class ComboEmpresaComponent
   selectedOption: any;
   noResult: boolean;
   isDisabled: boolean;
-  @ViewChild('combo', { static: false, read: NgControl }) combo;
+  // @ViewChild('combo', { static: false, read: NgControl }) combo;
 
   onChange = (_: any) => {};
   onTouch = () => {};
-  control;
+  // control;
 
-  constructor() {
+  constructor(
+    private cd: ChangeDetectorRef,
+    @Optional() @Self() public ngControl: NgControl
+  ) {
+    // private cdr: ChangeDetectorRef
     this.myForm = new FormGroup({
       user: new FormControl('')
     });
     this.selectElement = new EventEmitter<any>();
     this.noSelectElement = new EventEmitter<any>();
+
+    if (this.ngControl != null) {
+      // Setting the value accessor directly (instead of using
+      // the providers) to avoid running into a circular import.
+      this.ngControl.valueAccessor = this;
+    }
   }
 
   ngOnInit() {}
 
   ngAfterViewInit() {
-    this.validate(null);
+    // this.validate(null);
   }
 
   onSelect(event) {
     this.onChange(event.value);
     this.selectElement.emit({ event });
+    // this.validate(this.myForm.get('user'));
   }
 
   noSelect(event) {
@@ -105,21 +119,20 @@ export class ComboEmpresaComponent
 
   setDisabledState(isDisabled: boolean): void {}
 
-  validate(control: AbstractControl): ValidationErrors | null {
-    if (!this.control) {
-      this.control = control;
-    }
-    // if (this.control && this.combo) {
-    //   this.combo.control.setValidators(this.control.validator);
-    // }
-
-    if (this.combo.control.errors) {
-      return { invalid: true };
-    }
-    return null;
-  }
+  // validate(control: AbstractControl): ValidationErrors | null {
+  //   const errors = this.myForm.get('user').errors;
+  //   if (errors) {
+  //     return { invalid: true };
+  //   } else {
+  //     this.myForm.setErrors(null);
+  //   }
+  //   return null;
+  // }
 
   refrescValidacio() {
-    this.validate(this.combo);
+    console.log('HI HA ERROR!!');
+    this.ngControl.control.setErrors({ invalid: true });
+    // this.myForm.reset();
+    // this.cdr.markForCheck();
   }
 }

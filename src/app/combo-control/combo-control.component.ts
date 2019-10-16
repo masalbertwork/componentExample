@@ -194,9 +194,11 @@ export class ComboControlComponent
   }
 
   blur(evt) {
-    console.log(`onBlur`);
-    // if( this.selectedOption === null || this.selectedOption === '' ){
-    if (evt.currentTarget.value === this.selectedOption.name) {
+    console.log(`blur`);
+    if (
+      this.selectedOption &&
+      evt.currentTarget.value === this.selectedOption.name
+    ) {
       this.onChange(this.selectedValue);
     } else {
       this.selectedOption = null;
@@ -205,19 +207,13 @@ export class ComboControlComponent
       this.ngControl.control.setErrors({ invalid: true });
       this.validaElement.emit();
     }
-
-    // this.cd.markForCheck();
   }
   canvi(evt) {
-    // if (
-    //   event.currentTarget.value === '' ||
-    //   event.currentTarget.value === null
-    // ) {
-    //   this.selectedOption = null;
-    //   this.selectedValue = null;
-    // }
     console.log(`canvi:${evt.currentTarget.value}`);
-    if (evt.currentTarget.value === this.selectedOption.name) {
+    if (
+      this.selectedOption &&
+      evt.currentTarget.value === this.selectedOption.name
+    ) {
       this.onChange(this.selectedValue);
     } else {
       this.selectedOption = null;
@@ -227,8 +223,6 @@ export class ComboControlComponent
       this.ngControl.control.setErrors({ invalid: true });
       this.validaElement.emit();
     }
-
-    // this.cd.markForCheck();
   }
 
   marxem(event) {

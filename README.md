@@ -28,3 +28,4 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 https://github.com/angular/angular/issues/23657
 https://hackernoon.com/everything-you-need-to-know-about-change-detection-in-angular-8006c51d206f
+https://netbasal.com/make-your-angular-forms-error-messages-magically-appear-1e32350b7fa5

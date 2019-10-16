@@ -12,13 +12,6 @@
     </div>
     <div><button (click)="disa()">DISABLED</button></div>
 
-    <div
-      class="jumbotron"
-      [ngClass]="{ novalid: !pruebaForm.get('empresa').valid }"
-      *ngIf="showDades"
-    >
-      {{ pruebaForm.get('empresa').value }}
-    </div>
     <app-combo-empresa
       formControlName="empresa"
       (selectElement)="onSelect($event)"
