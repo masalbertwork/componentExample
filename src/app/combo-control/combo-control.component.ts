@@ -21,7 +21,8 @@ import {
   Validator,
   AbstractControl,
   ValidationErrors,
-  NG_VALIDATORS
+  NG_VALIDATORS,
+  FormControl
 } from '@angular/forms';
 
 @Component({
@@ -29,16 +30,16 @@ import {
   templateUrl: './combo-control.component.html',
   styleUrls: ['./combo-control.component.scss'],
   providers: [
-    //   {
-    //     provide: NG_VALUE_ACCESSOR,
-    //     useExisting: forwardRef(() => ComboControlComponent),
-    //     multi: true
-    //   },
-    // {
-    //   provide: NG_VALIDATORS,
-    //   useExisting: forwardRef(() => ComboControlComponent),
-    //   multi: true
-    // }
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => ComboControlComponent),
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => ComboControlComponent),
+      multi: true
+    }
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -101,6 +102,7 @@ export class ComboControlComponent
   noResult: boolean;
   isDisabled: boolean;
   emmitdelete: boolean;
+  parseError: boolean;
 
   @Output() selectElement: EventEmitter<any>;
   @Output() noSelectElement: EventEmitter<any>;
@@ -111,20 +113,13 @@ export class ComboControlComponent
   onTouch = () => {};
 
   constructor(
-    private cd: ChangeDetectorRef,
-    @Optional() @Self() public ngControl: NgControl
+    private cd: ChangeDetectorRef // @Optional() @Self() public ngControl: NgControl
   ) {
     this.selectElement = new EventEmitter<any>();
     this.noSelectElement = new EventEmitter<any>();
     this.focusElement = new EventEmitter<any>();
     this.deleteElement = new EventEmitter<any>();
     this.validaElement = new EventEmitter<any>();
-
-    if (this.ngControl != null) {
-      // Setting the value accessor directly (instead of using
-      // the providers) to avoid running into a circular import.
-      this.ngControl.valueAccessor = this;
-    }
   }
 
   ngOnInit() {
@@ -136,17 +131,14 @@ export class ComboControlComponent
     this.onChange(event.value);
     this.selectElement.emit(event);
     this.emmitdelete = false;
-    // this.cd.detectChanges();
+    this.parseError = false;
     this.cd.markForCheck();
   }
 
   typeaheadNoResults(event: boolean): void {
     // if (event && this.selectedValue.length >= 3) {
     this.noResult = event;
-    // this.onChange(null);
     this.noSelectElement.emit(null);
-    // this.writeValue(null);
-    // }
   }
 
   writeValue(value: any): void {
@@ -171,20 +163,14 @@ export class ComboControlComponent
     this.isDisabled = isDisabled;
   }
 
-  validate(control: AbstractControl): ValidationErrors | null {
-    if (!control) {
-      // this.control = control;
-    }
-
-    // if (this.control && this.input) {
-    // this.input.control.setValidators(this.control.validator);
-    // }
-
-    if (control.value === 'qqq') {
-      return { error: 'Inner error:The value is 1' };
-    }
-
-    return null;
+  public validate(c: FormControl) {
+    return !this.parseError
+      ? null
+      : {
+          jsonParseError: {
+            valid: false
+          }
+        };
   }
 
   tocat(evt: Event) {
@@ -193,40 +179,21 @@ export class ComboControlComponent
     this.focusElement.emit(this.selectedValue);
   }
 
-  blur(evt) {
-    console.log(`blur`);
-    if (
-      this.selectedOption &&
-      evt.currentTarget.value === this.selectedOption.name
-    ) {
-      this.onChange(this.selectedValue);
-    } else {
-      this.selectedOption = null;
-      this.selectedValue = null;
-      this.onChange(null);
-      this.ngControl.control.setErrors({ invalid: true });
-      this.validaElement.emit();
-    }
-  }
   canvi(evt) {
     console.log(`canvi:${evt.currentTarget.value}`);
     if (
       this.selectedOption &&
       evt.currentTarget.value === this.selectedOption.name
     ) {
+      this.parseError = false;
       this.onChange(this.selectedValue);
     } else {
+      this.parseError = true;
       this.selectedOption = null;
       this.selectedValue = null;
       this.onChange(null);
-      // this.ngControl.control.setErrors({ valid: false });
-      this.ngControl.control.setErrors({ invalid: true });
       this.validaElement.emit();
     }
-  }
-
-  marxem(event) {
-    this.onChange(this.selectedValue);
   }
 
   ngDoCheck() {
