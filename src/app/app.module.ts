@@ -10,6 +10,7 @@ import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { ComboEmpresaComponent } from './combo-empresa/combo-empresa.component';
 import { Combo1Component } from './combo1/combo1.component';
 import { Combo2Component } from './combo2/combo2.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { Combo2Component } from './combo2/combo2.component';
     InputControlModule,
     FormsModule,
     ReactiveFormsModule,
+    HttpClientModule,
     TypeaheadModule.forRoot()
   ],
   providers: [],

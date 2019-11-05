@@ -10,10 +10,12 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Optional,
-  Self
+  Self,
+  Input
 } from '@angular/core';
-import { Observable, observable, of } from 'rxjs';
+import { Observable, observable, of, Subject } from 'rxjs';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/typeahead-match.class';
+import { mergeMap, map } from 'rxjs/operators';
 import {
   ControlValueAccessor,
   NG_VALUE_ACCESSOR,
@@ -24,6 +26,7 @@ import {
   NG_VALIDATORS,
   FormControl
 } from '@angular/forms';
+import { AppActivitatService } from '../app.service';
 
 @Component({
   selector: 'app-combo-control',
@@ -47,6 +50,7 @@ export class ComboControlComponent
   implements OnInit, ControlValueAccessor, DoCheck, Validator {
   selectedValue: string;
   selectedOption: any;
+  typeaheadLoading: boolean;
   states: any[] = [
     { id: 1, name: 'Alabama', region: 'South' },
     { id: 2, name: 'Alaska', region: 'West' },
@@ -99,20 +103,56 @@ export class ComboControlComponent
     { id: 50, name: 'Wisconsin', region: 'Midwest' },
     { id: 51, name: 'Wyoming', region: 'West' }
   ];
+  empresas: any;
+  empresasFav: any;
+  _favoritos: boolean;
+  _maestros: boolean;
+  _fields: any[];
+
+  empresasObservable: Observable<any[]>;
+  empresasObservable2: Observable<any[]>;
+
+  @Input('data')
+  set data(value: Array<any>) {
+    this.empresasFav = value;
+  }
+
+  @Input('favoritos')
+  set favoritos(value: boolean) {
+    this._favoritos = value;
+  }
+
+  @Input('maestro')
+  set maestros(value: boolean) {
+    this._maestros = value;
+  }
+
+  @Input('fields')
+  set fields(value: Array<any>) {
+    console.log('seteo fields' + value.length);
+    this._fields = value;
+  }
+
   noResult: boolean;
   isDisabled: boolean;
   emmitdelete: boolean;
   parseError: boolean;
-
+  dataSource: Observable<any>;
   @Output() selectElement: EventEmitter<any>;
   @Output() noSelectElement: EventEmitter<any>;
   @Output() focusElement: EventEmitter<any>;
   @Output() deleteElement: EventEmitter<any>;
   @Output() validaElement: EventEmitter<any>;
+
+  private contactSubject = new Subject<any>();
+  contactsChange$ = this.contactSubject.asObservable();
+  private contactsList = [];
+
   onChange = (_: any) => {};
   onTouch = () => {};
 
   constructor(
+    private empresaAcitivitatService: AppActivitatService,
     private cd: ChangeDetectorRef // @Optional() @Self() public ngControl: NgControl
   ) {
     this.selectElement = new EventEmitter<any>();
@@ -120,10 +160,42 @@ export class ComboControlComponent
     this.focusElement = new EventEmitter<any>();
     this.deleteElement = new EventEmitter<any>();
     this.validaElement = new EventEmitter<any>();
+
+    this.dataSource = Observable.create((observer: any) => {
+      // Runs on every search
+      observer.next(this.selectedValue);
+    }).pipe(mergeMap((token: string) => this.getStatesAsObservable(token)));
   }
 
   ngOnInit() {
     this.emmitdelete = false;
+    if (this._favoritos) {
+      this.empresasObservable = Observable.create((observer: any) => {
+        observer.next(this.selectedValue);
+      }).pipe(
+        mergeMap(
+          (token: string) => this.getStatesAsObservableFav(token)
+
+          /* this.getContacts(token)*/
+        )
+      );
+    } else {
+      this.empresasObservable = Observable.create();
+    }
+  }
+
+  getStatesAsObservable(token: string): Observable<any> {
+    const query = new RegExp(token, 'i');
+
+    return of(
+      this.states.filter((state: any) => {
+        return query.test(state.name);
+      })
+    );
+  }
+
+  changeTypeaheadLoading(e: boolean): void {
+    this.typeaheadLoading = e;
   }
 
   onSelect(event: TypeaheadMatch): void {
@@ -203,5 +275,46 @@ export class ComboControlComponent
         this.deleteElement.emit({ event: 'deleteElement', object: null });
       }
     }
+  }
+
+  /* */
+  getStatesAsObservableFav(token: string): Observable<any> {
+    if (token === undefined || token === null) {
+      token = '';
+    }
+    const arr = this.multiFilterExt(this.empresasFav, this._fields, token);
+    return of(arr);
+  }
+
+  multiFilterExt(array: any[], filters, value) {
+    console.log(filters.length);
+    return array.filter(o =>
+      filters.some(k => {
+        if (o[k] !== undefined && o[k] !== null) {
+          return o[k]
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase());
+        }
+      })
+    );
+  }
+
+  getContacts(token: string) {
+    const payload = { activity: 'TE' };
+    if (token === undefined || token === null) {
+      token = '';
+    }
+    return this.empresaAcitivitatService.consultaTransportistas(payload).pipe(
+      map(data => {
+        this.contactsList = this.multiFilterExt(data, this._fields, token);
+        this.contactSubject.next(this.contactsList);
+      })
+    );
+  }
+
+  addContact(item) {
+    this.contactsList.push(item);
+    this.contactSubject.next(this.contactsList);
   }
 }

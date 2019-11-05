@@ -7,12 +7,15 @@ Selected option: {{ selectedOption | json }}</pre
 
 <input
   [(ngModel)]="selectedValue"
-  [typeahead]="states"
+  [typeahead]="empresasObservable"
   typeaheadOptionField="name"
   (typeaheadOnSelect)="onSelect($event)"
   (typeaheadNoResults)="typeaheadNoResults($event)"
+  [typeaheadScrollable]="true"
+  [typeaheadOptionsInScrollableView]="10"
   [typeaheadMinLength]="0"
   (change)="canvi($event)"
   (focus)="tocat($event)"
   class="form-control"
 />
+<div *ngIf="typeaheadLoading">Loading</div>
