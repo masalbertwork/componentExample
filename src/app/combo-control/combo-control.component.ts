@@ -13,9 +13,15 @@ import {
   Self,
   Input
 } from '@angular/core';
-import { Observable, observable, of, Subject } from 'rxjs';
+import { Observable, observable, of, Subject, fromEvent, forkJoin } from 'rxjs';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/typeahead-match.class';
-import { mergeMap, map } from 'rxjs/operators';
+import {
+  mergeMap,
+  map,
+  filter,
+  debounceTime,
+  distinctUntilChanged
+} from 'rxjs/operators';
 import {
   ControlValueAccessor,
   NG_VALUE_ACCESSOR,
@@ -111,6 +117,7 @@ export class ComboControlComponent
 
   empresasObservable: Observable<any[]>;
   empresasObservable2: Observable<any[]>;
+  empresasObservable3: Observable<any[]>;
 
   @Input('data')
   set data(value: Array<any>) {
@@ -147,6 +154,9 @@ export class ComboControlComponent
   private contactSubject = new Subject<any>();
   contactsChange$ = this.contactSubject.asObservable();
   private contactsList = [];
+  @ViewChild('inputFilter', { static: false }) inputFilter: ElementRef;
+  apiResponse: any;
+  isSearching: boolean;
 
   onChange = (_: any) => {};
   onTouch = () => {};
@@ -161,14 +171,30 @@ export class ComboControlComponent
     this.deleteElement = new EventEmitter<any>();
     this.validaElement = new EventEmitter<any>();
 
-    this.dataSource = Observable.create((observer: any) => {
-      // Runs on every search
-      observer.next(this.selectedValue);
-    }).pipe(mergeMap((token: string) => this.getStatesAsObservable(token)));
+    this.isSearching = false;
+    this.apiResponse = [];
+
+    // this.dataSource = Observable.create((observer: any) => {
+    //   // Runs on every search
+    //   observer.next(this.selectedValue);
+    // }).pipe(mergeMap((token: string) => this.getStatesAsObservable(token)));
   }
 
   ngOnInit() {
     this.emmitdelete = false;
+
+    let first = of({ source: 1, value: 1 });
+    const second: Observable<any[]> = of([
+      {
+        name: 'ALBERT MAS',
+        nif: '34324344P'
+      },
+      {
+        name: 'PERE MAS',
+        nif: '34324344P'
+      }
+    ]);
+
     if (this._favoritos) {
       this.empresasObservable = Observable.create((observer: any) => {
         observer.next(this.selectedValue);
@@ -182,6 +208,103 @@ export class ComboControlComponent
     } else {
       this.empresasObservable = Observable.create();
     }
+
+    if (this._maestros) {
+      this.empresasObservable2 = Observable.create((observer: any) => {
+        observer.next(this.selectedValue);
+      }).pipe(
+        mergeMap(
+          (token: string) => this.getContacts(token)
+
+          /* this.getContacts(token)*/
+        )
+      );
+    } else {
+      this.empresasObservable2 = Observable.create();
+    }
+
+    // if (this._maestros && this._favoritos) {
+    //   forkJoin(this.empresasObservable, this.empresasObservable2).subscribe(
+    //     res => {
+    //       console.log('GOT:', res);
+    //     }
+    //   );
+    // }
+    if (this._maestros && this._favoritos) {
+      this.empresasObservable3 = Observable.create((observer: any) => {
+        observer.next(this.selectedValue);
+      }).pipe(
+        mergeMap((
+          x // Aplanamos porque forkJoin devuelve un Observable de Observables
+        ) => forkJoin(this.empresasObservable, this.empresasObservable2))
+      );
+    }
+
+    // this.empresasObservable = Observable.create((observer: any) => {
+    //   observer.next(this.selectedValue);
+    // })
+    //   .pipe(
+    //     // get value
+    //     map((event: any) => {
+    //       return event.target.value;
+    //     }),
+    //     // if character length greater then 2
+    //     filter((res: Array<any>) => res.length > 2),
+    //     // Time in milliseconds between key events
+    //     debounceTime(1000),
+    //     // If previous query is diffent from current
+    //     distinctUntilChanged()
+    //   )
+    //   .subscribe((text: string) => {
+    //     this.isSearching = true;
+    //     this.searchGetCall(text).subscribe(
+    //       res => {
+    //         console.log('res', res);
+    //         this.isSearching = false;
+    //         this.apiResponse = res;
+    //       },
+    //       err => {
+    //         this.isSearching = false;
+    //         console.log('error', err);
+    //       }
+    //     );
+    //   });
+
+    // fromEvent(this.inputFilter.nativeElement, 'keyup')
+    //   .pipe(
+    //     // get value
+    //     map((event: any) => {
+    //       return event.target.value;
+    //     }),
+    //     // if character length greater then 2
+    //     filter(res => res.length > 2),
+    //     // Time in milliseconds between key events
+    //     debounceTime(1000),
+    //     // If previous query is diffent from current
+    //     distinctUntilChanged()
+    //     // subscription for response
+    //   )
+    //   .subscribe((text: string) => {
+    //     this.isSearching = true;
+    //     this.searchGetCall(text).subscribe(
+    //       res => {
+    //         console.log('res', res);
+    //         this.isSearching = false;
+    //         this.apiResponse = res;
+    //       },
+    //       err => {
+    //         this.isSearching = false;
+    //         console.log('error', err);
+    //       }
+    //     );
+    //   });
+  }
+
+  searchGetCall(term: string) {
+    if (term === '') {
+      return of([]);
+    }
+    return this.getContacts(term);
   }
 
   getStatesAsObservable(token: string): Observable<any> {
@@ -300,7 +423,7 @@ export class ComboControlComponent
     );
   }
 
-  getContacts(token: string) {
+  getContacts(token: string): Observable<any> {
     const payload = { activity: 'TE' };
     if (token === undefined || token === null) {
       token = '';
@@ -308,7 +431,8 @@ export class ComboControlComponent
     return this.empresaAcitivitatService.consultaTransportistas(payload).pipe(
       map(data => {
         this.contactsList = this.multiFilterExt(data, this._fields, token);
-        this.contactSubject.next(this.contactsList);
+        // this.contactSubject.next(this.contactsList);
+        return this.contactsList;
       })
     );
   }

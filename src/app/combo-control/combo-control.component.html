@@ -6,6 +6,7 @@ Selected option: {{ selectedOption | json }}</pre
 > -->
 
 <input
+  #inputFilter
   [(ngModel)]="selectedValue"
   [typeahead]="empresasObservable"
   typeaheadOptionField="name"
