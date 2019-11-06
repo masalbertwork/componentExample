@@ -17,6 +17,8 @@ Selected option: {{ selectedOption | json }}</pre
   [typeaheadMinLength]="0"
   (change)="canvi($event)"
   (focus)="tocat($event)"
+  (keyup)="tecleig($event)"
   class="form-control"
 />
 <div *ngIf="typeaheadLoading">Loading</div>
+<div>{{ myData.value.length }}</div>

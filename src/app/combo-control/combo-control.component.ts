@@ -13,14 +13,24 @@ import {
   Self,
   Input
 } from '@angular/core';
-import { Observable, observable, of, Subject, fromEvent, forkJoin } from 'rxjs';
+import {
+  Observable,
+  observable,
+  of,
+  Subject,
+  fromEvent,
+  forkJoin,
+  BehaviorSubject
+} from 'rxjs';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/typeahead-match.class';
 import {
   mergeMap,
   map,
   filter,
   debounceTime,
-  distinctUntilChanged
+  distinctUntilChanged,
+  zip,
+  tap
 } from 'rxjs/operators';
 import {
   ControlValueAccessor,
@@ -118,6 +128,8 @@ export class ComboControlComponent
   empresasObservable: Observable<any[]>;
   empresasObservable2: Observable<any[]>;
   empresasObservable3: Observable<any[]>;
+  initial: any = null;
+  initialMore: string = null;
 
   @Input('data')
   set data(value: Array<any>) {
@@ -157,6 +169,8 @@ export class ComboControlComponent
   @ViewChild('inputFilter', { static: false }) inputFilter: ElementRef;
   apiResponse: any;
   isSearching: boolean;
+  public myData: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+  public currentData: Observable<any[]>;
 
   onChange = (_: any) => {};
   onTouch = () => {};
@@ -172,7 +186,14 @@ export class ComboControlComponent
     this.validaElement = new EventEmitter<any>();
 
     this.isSearching = false;
-    this.apiResponse = [];
+    this.apiResponse = [{ name: 'HOLA', nif: '11232321K' }];
+
+    this.currentData = this.myData.asObservable();
+
+    this.currentData.subscribe(res => {
+      this.apiResponse = res;
+      console.log(res);
+    });
 
     // this.dataSource = Observable.create((observer: any) => {
     //   // Runs on every search
@@ -197,21 +218,25 @@ export class ComboControlComponent
 
     if (this._favoritos) {
       this.empresasObservable = Observable.create((observer: any) => {
-        observer.next(this.selectedValue);
+        observer.next(this.initial);
       }).pipe(
-        mergeMap(
-          (token: string) => this.getStatesAsObservableFav(token)
-
-          /* this.getContacts(token)*/
+        tap(x => console.log(x)),
+        mergeMap((token: string) =>
+          //const _token = token === null ? '' : token;
+          this.getStatesAsObservableFav(token)
         )
       );
     } else {
       this.empresasObservable = Observable.create();
     }
 
+    // this.empresasObservable2.subscribe(res => {
+    //   console.log(`EMPRESA2->${JSON.stringify(res)}`);
+    // });
+
     if (this._maestros) {
       this.empresasObservable2 = Observable.create((observer: any) => {
-        observer.next(this.selectedValue);
+        observer.next(this.initialMore);
       }).pipe(
         mergeMap(
           (token: string) => this.getContacts(token)
@@ -238,6 +263,11 @@ export class ComboControlComponent
           x // Aplanamos porque forkJoin devuelve un Observable de Observables
         ) => forkJoin(this.empresasObservable, this.empresasObservable2))
       );
+
+      this.empresasObservable3.subscribe(res => {
+        this.myData.next(res);
+        console.log(res);
+      });
     }
 
     // this.empresasObservable = Observable.create((observer: any) => {
@@ -369,9 +399,15 @@ export class ComboControlComponent
   }
 
   tocat(evt: Event) {
-    console.log(`touched`);
+    this.initial = '';
     this.onTouch();
     this.focusElement.emit(this.selectedValue);
+  }
+
+  tecleig(evt) {
+    if (evt.currentTarget.value.length > 2) {
+      this.initialMore = '';
+    }
   }
 
   canvi(evt) {
@@ -406,6 +442,7 @@ export class ComboControlComponent
       token = '';
     }
     const arr = this.multiFilterExt(this.empresasFav, this._fields, token);
+    this.myData.next(arr);
     return of(arr);
   }
 
@@ -431,7 +468,7 @@ export class ComboControlComponent
     return this.empresaAcitivitatService.consultaTransportistas(payload).pipe(
       map(data => {
         this.contactsList = this.multiFilterExt(data, this._fields, token);
-        // this.contactSubject.next(this.contactsList);
+        this.myData.next(this.contactsList);
         return this.contactsList;
       })
     );
